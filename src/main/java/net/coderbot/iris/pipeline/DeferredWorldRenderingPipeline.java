@@ -93,6 +93,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 
+import net.coderbot.iris.compat.dh.DHCompat;
+
 /**
  * Encapsulates the compiled shader program objects for the currently loaded shaderpack.
  */
@@ -164,6 +166,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 	private PackDirectives packDirectives;
 	private ColorSpace currentColorSpace;
 
+	private DHCompat dhCompat;
+
 	public DeferredWorldRenderingPipeline(ProgramSet programs) {
 		Objects.requireNonNull(programs);
 
@@ -192,6 +196,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			depthBufferFormat, programs.getPackDirectives().getRenderTargetDirectives().getRenderTargetSettings(), programs.getPackDirectives());
 
 		this.sunPathRotation = programs.getPackDirectives().getSunPathRotation();
+
+		this.dhCompat = new DHCompat();
 
 		PackShadowDirectives shadowDirectives = programs.getPackDirectives().getShadowDirectives();
 
@@ -347,6 +353,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			});
 		});
 
+
+
 		if (shadowRenderTargets == null && shadowDirectives.isShadowEnabled() == OptionalBoolean.TRUE) {
 			shadowRenderTargets = new ShadowRenderTargets(shadowMapResolution, shadowDirectives);
 		}
@@ -436,6 +444,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			return builder.build();
 		};
 
+		dhCompat.setFramebuffer(renderTargets.createGbufferFramebuffer(ImmutableSet.of(), new int[] { 0 }));
+
 		this.sodiumTerrainPipeline = new SodiumTerrainPipeline(this, programs, createTerrainSamplers,
 			shadowRenderer == null ? null : createShadowTerrainSamplers, createTerrainImages,
 			shadowRenderer == null ? null : createShadowTerrainImages);
@@ -459,6 +469,9 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 				colorSpaceConverter = new ColorSpaceFragmentConverter(mainTarget.width, mainTarget.height, IrisVideoSettings.colorSpace);
 			}
 		}
+
+
+
 
 		currentColorSpace = IrisVideoSettings.colorSpace;
 	}
@@ -1307,4 +1320,10 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			PBRTextureManager.notifyPBRTexturesChanged();
 		}
 	}
+
+	@Override
+	public DHCompat getDHCompat() {
+		return dhCompat;
+	}
+
 }

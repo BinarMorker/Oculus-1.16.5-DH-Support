@@ -10,6 +10,7 @@ import net.coderbot.iris.mixin.LevelRendererAccessor;
 import net.coderbot.iris.shaderpack.CloudSetting;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
 import net.minecraft.client.Camera;
+import net.coderbot.iris.compat.dh.DHCompat;
 
 public interface WorldRenderingPipeline {
 	void beginLevelRendering();
@@ -54,4 +55,6 @@ public interface WorldRenderingPipeline {
 	boolean allowConcurrentCompute();
 
 	float getSunPathRotation();
+
+	DHCompat getDHCompat();
 }
